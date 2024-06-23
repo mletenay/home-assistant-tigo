@@ -1,0 +1,6 @@
+{
+  "name": "Tigo CCA",
+  "country": "SK",
+  "domains": ["sensor"],
+  "homeassistant": "2024.6.0"
+}
