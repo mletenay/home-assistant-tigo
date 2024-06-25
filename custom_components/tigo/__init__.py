@@ -23,13 +23,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     try:
         _LOGGER.debug("Connecting to Tigo CCA at %s", host)
-        tigo = TigoCCA(host, username, password)
-        status = await tigo.get_status()
+        cca = TigoCCA(host, username, password)
+        await cca.read_config()
+        status = await cca.get_status()
     except Exception as err:
         raise ConfigEntryNotReady from err
 
     # Create update coordinator
-    coordinator = TigoUpdateCoordinator(hass, entry, tigo, status)
+    coordinator = TigoUpdateCoordinator(hass, entry, cca, status)
 
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_config_entry_first_refresh()

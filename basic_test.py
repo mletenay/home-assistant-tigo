@@ -15,6 +15,8 @@ logging.basicConfig(
 
 async def _test_command():
     tigo = TigoCCA("192.168.1.125", "Tigo", "$olar")
+    status = await asyncio.wait_for(tigo.read_config(), 1)
+    print(tigo.panels)
     status = await asyncio.wait_for(tigo.get_status(), 1)
     print(status)
 

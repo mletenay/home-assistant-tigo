@@ -38,6 +38,13 @@ class TigoSensorEntityDescription(SensorEntityDescription):
     getter: Callable[[PanelStatus], Any] = None
 
 
+_CCA_TEMP: TigoSensorEntityDescription = TigoSensorEntityDescription(
+    key="cca_temperature",
+    device_class=SensorDeviceClass.TEMPERATURE,
+    state_class=SensorStateClass.MEASUREMENT,
+    native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+)
+
 _VOLTAGE_IN: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="voltage_in",
     device_class=SensorDeviceClass.VOLTAGE,
@@ -73,6 +80,12 @@ _TEMP: TigoSensorEntityDescription = TigoSensorEntityDescription(
     native_unit_of_measurement=UnitOfTemperature.CELSIUS,
     getter=lambda panel: panel.temperature,
 )
+_PWM: TigoSensorEntityDescription = TigoSensorEntityDescription(
+    key="pwm",
+    state_class=SensorStateClass.MEASUREMENT,
+    getter=lambda panel: panel.pwm,
+    #    entity_category=EntityCategory.DIAGNOSTIC,
+)
 _RSSI: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="rssi",
     device_class=SensorDeviceClass.SIGNAL_STRENGTH,
@@ -97,6 +110,7 @@ _PANEL_SENSORS: tuple[TigoSensorEntityDescription] = (
     _CURRENT,
     _POWER,
     _TEMP,
+    _PWM,
     _RSSI,
     _BYPASS,
 )
@@ -112,18 +126,42 @@ async def async_setup_entry(
         KEY_COORDINATOR
     ]
 
-    entities: list[TigoSensorEntity] = []
+    entities: list[TigoPanelSensorEntity] = [
+        TigoCcaSensorEntity(coordinator, _CCA_TEMP)
+    ]
 
     for panel in coordinator.data.panels.values():
         entities.extend(
-            TigoSensorEntity(coordinator, panel, sensor) for sensor in _PANEL_SENSORS
+            TigoPanelSensorEntity(coordinator, panel, sensor)
+            for sensor in _PANEL_SENSORS
         )
 
     async_add_entities(entities)
 
 
-class TigoSensorEntity(CoordinatorEntity[TigoUpdateCoordinator], SensorEntity):
-    """Representation of Tigo sensor."""
+class TigoCcaSensorEntity(CoordinatorEntity[TigoUpdateCoordinator], SensorEntity):
+    """Representation of Tigo CCA sensor."""
+
+    def __init__(
+        self,
+        coordinator: TigoUpdateCoordinator,
+        description: TigoSensorEntityDescription,
+    ) -> None:
+        """Initialize the entity."""
+        super().__init__(coordinator)
+        self._attr_name = f"CCA {description.key}"
+        self._attr_unique_id = f"{description.key}-{coordinator.serial_nr}"
+        self._attr_device_info = coordinator.device_info
+        self.entity_description: TigoSensorEntityDescription = description
+
+    @property
+    def native_value(self):
+        """Return the value reported by the sensor."""
+        return self.coordinator.data.temperature
+
+
+class TigoPanelSensorEntity(CoordinatorEntity[TigoUpdateCoordinator], SensorEntity):
+    """Representation of Tigo panel sensor."""
 
     def __init__(
         self,
@@ -139,9 +177,16 @@ class TigoSensorEntity(CoordinatorEntity[TigoUpdateCoordinator], SensorEntity):
         self.entity_description: TigoSensorEntityDescription = description
         self.panel_id = panel.label
 
+    def _panel_status(self) -> PanelStatus:
+        return self.coordinator.panel_status(self.panel_id)
+
     @property
     def native_value(self):
         """Return the value reported by the sensor."""
-        return self.entity_description.getter(
-            self.coordinator.data.panels.get(self.panel_id)
-        )
+        status: PanelStatus = self._panel_status()
+        return self.entity_description.getter(status) if status else None
+
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        return self.native_value is not None
