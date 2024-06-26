@@ -1,6 +1,4 @@
 {
-  "name": "Tigo CCA",
-  "country": "SK",
-  "domains": ["button", "sensor"],
+  "name": "Tigo CCA (local network) monitoring and management",
   "homeassistant": "2024.6.0"
 }
