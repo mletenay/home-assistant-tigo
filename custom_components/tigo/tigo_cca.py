@@ -301,3 +301,11 @@ class TigoCCA:
         parser.feed(await self._get("/cgi-bin/meshdatapower"))
         parser.close()
         return status
+
+    async def turn_modules_off(self) -> None:
+        """Turn all modules OFF."""
+        await self._get("/cgi-bin/lmudui?State=3")
+
+    async def turn_modules_on(self) -> None:
+        """Turn all modules ON."""
+        await self._get("/cgi-bin/lmudui?State=1")

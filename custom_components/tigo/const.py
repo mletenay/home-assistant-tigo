@@ -6,7 +6,7 @@ from homeassistant.const import Platform
 
 DOMAIN = "tigo"
 
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.BUTTON, Platform.SENSOR]
 
 DEFAULT_NAME = "Tigo CCA"
 SCAN_INTERVAL = timedelta(seconds=30)

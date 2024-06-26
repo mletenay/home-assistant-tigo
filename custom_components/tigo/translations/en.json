@@ -18,5 +18,15 @@
                 "description": "Connect to Tigo CCA"
             }
         }
+    },
+    "entity": {
+      "button": {
+        "turn_modules_off": {
+          "name": "Turn modules OFF"
+        },
+        "turn_modules_on": {
+          "name": "Turn modules ON"
+        }
+      }
     }
 }

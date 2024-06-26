@@ -33,7 +33,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class TigoSensorEntityDescription(SensorEntityDescription):
-    """Class describing Goodwe sensor entities."""
+    """Class describing Tigo sensor entities."""
 
     getter: Callable[[PanelStatus], Any] = None
 
@@ -142,6 +142,8 @@ async def async_setup_entry(
 class TigoCcaSensorEntity(CoordinatorEntity[TigoUpdateCoordinator], SensorEntity):
     """Representation of Tigo CCA sensor."""
 
+    entity_description: TigoSensorEntityDescription
+
     def __init__(
         self,
         coordinator: TigoUpdateCoordinator,
@@ -152,7 +154,7 @@ class TigoCcaSensorEntity(CoordinatorEntity[TigoUpdateCoordinator], SensorEntity
         self._attr_name = f"CCA {description.key}"
         self._attr_unique_id = f"{description.key}-{coordinator.serial_nr}"
         self._attr_device_info = coordinator.device_info
-        self.entity_description: TigoSensorEntityDescription = description
+        self.entity_description = description
 
     @property
     def native_value(self):
@@ -162,6 +164,8 @@ class TigoCcaSensorEntity(CoordinatorEntity[TigoUpdateCoordinator], SensorEntity
 
 class TigoPanelSensorEntity(CoordinatorEntity[TigoUpdateCoordinator], SensorEntity):
     """Representation of Tigo panel sensor."""
+
+    entity_description: TigoSensorEntityDescription
 
     def __init__(
         self,
@@ -174,7 +178,7 @@ class TigoPanelSensorEntity(CoordinatorEntity[TigoUpdateCoordinator], SensorEnti
         self._attr_name = f"Panel {panel.label} {description.key}"
         self._attr_unique_id = f"{description.key}-{panel.mac}-{coordinator.serial_nr}"
         self._attr_device_info = coordinator.panel_device_infos[panel.label]
-        self.entity_description: TigoSensorEntityDescription = description
+        self.entity_description = description
         self.panel_id = panel.label
 
     def _panel_status(self) -> PanelStatus:
