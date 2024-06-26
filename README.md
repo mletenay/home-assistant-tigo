@@ -15,7 +15,6 @@ Step by step instructions how to enable local network access to the CCA can be f
 In short:
 Open web page `http://[cca ip address]/cgi-bin/shell` (Tigo/$olar), then login into it via ssh (root/gW$70#c). When in, remount the filesystem to be writable `mount -o remount,rw /` and expose the web console to local network by adding SNAT to its internal net via `echo "/usr/sbin/iptables -t nat -D INPUT -p tcp --dport 80 -j SNAT --to 10.11.1.1" >> /etc/rc.httpd`.
 After reboot, the web console at `http://[cca ip address]/cgi-bin/mmdstatus` (Tigo/$olar) should be permanently accessible.
-This integration intentionally parses that page for getting panel monitoring data, it does not work with the raw csv/json data which can be exposed by further mofifications of the CCA filesystem.
 
 Just a remark, the procedure above exposes not only the administration console, but also a nice, user oriented web app at http://[cca ip address]/summary/
 

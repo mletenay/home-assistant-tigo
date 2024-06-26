@@ -15,7 +15,20 @@ class PanelVersionInfo:
     mac: str = None
     fw: str = None
     hw: str = None
-    model: str = "TS4-A-O"
+
+    def model(self) -> str:
+        """Return panel unit model."""
+        if "455" in self.hw:
+            return "TS4-A-M"
+        if "461" in self.hw or "462" in self.hw:
+            return "TS4-A-O"
+        if "466" in self.hw:
+            return "TS4-A-S"
+        if "481" in self.hw or "486" in self.hw or "488" in self.hw:
+            return "TS4-A-F"
+        if "484" in self.hw or "485" in self.hw or "487" in self.hw:
+            return "TS4-A-2F"
+        return "?"
 
     def __str__(self):
         """Return string representation of panel info."""
@@ -36,11 +49,25 @@ class PanelStatus:
     voltage_out: float = None
     current: float = None
     power: float = None
-    power_perc: float = None
     pwm: int = None
     temperature: float = None
+    status: int = None
     rssi: int = None
-    bypass: bool = None
+
+    def status_name(self) -> str:
+        """Return string representation of status.
+
+        The status int value is bitmap:
+        bit 7: ?
+        bit 6: panel on/off
+        bit 5: ?
+        bit 4: ?
+        bit 3: ?
+        bit 2: ?
+        bit 1: ?
+        bit 0: ?
+        """
+        return "?"
 
     def __str__(self):
         """Return string representation of panel status."""
@@ -113,70 +140,6 @@ class _CcaStatusPageParser(HTMLParser):
         self._in_td = False
 
 
-class _PanelsStatusPageParser(HTMLParser):
-    def __init__(self, cca: TigoCcaStatus) -> None:
-        """Initialize the panel status page parser."""
-        super().__init__()
-        self._cca = cca
-        self._in_table = False
-        self._in_row = False
-        self._td_nr = 0
-        self._td_done = False
-        self._status = None
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "table" and dict(attrs).get("class") == "list_tb":
-            self._in_table = True
-            self._cca.panels.clear()
-        elif (
-            tag == "tr"
-            and dict(attrs).get("class") != "tb_red_title"
-            and self._in_table
-        ):
-            self._in_row = True
-            self._status = PanelStatus()
-        elif tag == "td" and self._in_row:
-            self._td_nr += 1
-            self._td_done = False
-
-    def handle_data(self, data):
-        if self._td_nr > 0 and self._status and data != "n/a" and not self._td_done:
-            self._td_done = True
-            match self._td_nr:
-                case 1:
-                    self._status.label = data
-                case 3:
-                    self._status.mac = data
-                case 4:
-                    self._status.voltage_in = float(data)
-                case 6:
-                    self._status.voltage_out = float(data)
-                case 8:
-                    self._status.current = float(data)
-                case 9:
-                    self._status.power = float(data)
-                case 10:
-                    self._status.power_perc = float(data.replace("%", ""))
-                case 11:
-                    self._status.temperature = float(data)
-                case 12:
-                    self._status.rssi = int(data)
-                case 15:
-                    self._status.pwm = int(data)
-                case 19:
-                    self._status.bypass = data != "off"
-                case _:
-                    pass
-
-    def handle_endtag(self, tag):
-        if tag == "table" and self._in_table:
-            self._in_table = False
-        elif tag == "tr" and self._in_row:
-            self._in_row = False
-            self._td_nr = 0
-            self._cca.panels[self._status.label] = self._status
-
-
 class _TableParser(HTMLParser):
     def __init__(self) -> None:
         """Initialize the table parser."""
@@ -213,6 +176,49 @@ class _TableParser(HTMLParser):
 
     def _on_tr_end(self) -> None:
         pass
+
+
+class _PanelsStatusPageParser(_TableParser):
+    def __init__(self, cca: TigoCcaStatus) -> None:
+        """Initialize the panel status page parser."""
+        super().__init__()
+        self._cca: TigoCcaStatus = cca
+        self._status: PanelStatus = None
+        self._age: str = None
+
+    def _on_td(self, nr: int, data: str) -> None:
+        match nr:
+            case 1:
+                self._status = PanelStatus()
+            case 2:
+                self._status.mac = data.strip()
+            case 3:
+                self._status.label = data.strip()
+            case 4:
+                self._age = data
+            case 13:
+                self._status.voltage_in = float(data)
+            case 14:
+                self._status.voltage_out = float(data)
+            case 15:
+                self._status.current = float(data)
+            case 16:
+                self._status.power = float(data)
+            case 17:
+                self._status.pwm = int(data)
+            case 18:
+                self._status.temperature = float(data)
+            case 22:
+                self._status.status = int(data, 16)
+            case 23:
+                self._status.rssi = int(data)
+            case _:
+                pass
+
+    def _on_tr_end(self) -> None:
+        if self._status and "hrs" not in self._age and "min" not in self._age:
+            self._cca.panels[self._status.label] = self._status
+        self._status = None
 
 
 class _PanelsVersionPageParser(_TableParser):
@@ -292,6 +298,6 @@ class TigoCCA:
         parser.feed(await self._get("/cgi-bin/lmudui"))
         parser.close()
         parser = _PanelsStatusPageParser(status)
-        parser.feed(await self._get("/cgi-bin/mmdstatus"))
+        parser.feed(await self._get("/cgi-bin/meshdatapower"))
         parser.close()
         return status

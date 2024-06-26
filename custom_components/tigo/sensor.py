@@ -83,8 +83,16 @@ _TEMP: TigoSensorEntityDescription = TigoSensorEntityDescription(
 _PWM: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="pwm",
     state_class=SensorStateClass.MEASUREMENT,
+    icon="mdi:numeric",
     getter=lambda panel: panel.pwm,
-    #    entity_category=EntityCategory.DIAGNOSTIC,
+    # entity_category=EntityCategory.DIAGNOSTIC,
+)
+_STATUS: TigoSensorEntityDescription = TigoSensorEntityDescription(
+    key="status",
+    state_class=SensorStateClass.MEASUREMENT,
+    icon="mdi:information-outline",
+    getter=lambda panel: panel.status,
+    # entity_category=EntityCategory.DIAGNOSTIC,
 )
 _RSSI: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="rssi",
@@ -95,14 +103,6 @@ _RSSI: TigoSensorEntityDescription = TigoSensorEntityDescription(
     entity_category=EntityCategory.DIAGNOSTIC,
     entity_registry_enabled_default=False,
 )
-_BYPASS: TigoSensorEntityDescription = TigoSensorEntityDescription(
-    key="bypass",
-    device_class=SensorDeviceClass.ENUM,
-    state_class=SensorStateClass.MEASUREMENT,
-    options=["off", "on"],
-    icon="mdi:weather-cloudy-arrow-right",
-    getter=lambda panel: "on" if panel.bypass else "off",
-)
 
 _PANEL_SENSORS: tuple[TigoSensorEntityDescription] = (
     _VOLTAGE_IN,
@@ -111,8 +111,8 @@ _PANEL_SENSORS: tuple[TigoSensorEntityDescription] = (
     _POWER,
     _TEMP,
     _PWM,
+    _STATUS,
     _RSSI,
-    _BYPASS,
 )
 
 

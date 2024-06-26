@@ -69,7 +69,7 @@ def _panel_device(cca: TigoCcaStatus, panel: PanelVersionInfo) -> DeviceInfo:
         identifiers={(DOMAIN, panel.mac)},
         name=f"Panel {panel.label}",
         manufacturer="Tigo",
-        model=panel.model,
+        model=panel.model(),
         via_device=(DOMAIN, cca.unit_id),
         serial_number=panel.mac,
         hw_version=panel.hw,
