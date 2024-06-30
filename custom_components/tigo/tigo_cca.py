@@ -208,9 +208,9 @@ class _PanelsStatusPageParser(_TableParser):
                 self._status.pwm = int(data)
             case 18:
                 self._status.temperature = float(data)
-            case 22:
+            case 21:
                 self._status.status = int(data, 16)
-            case 23:
+            case 22:
                 self._status.rssi = int(data)
             case _:
                 pass
