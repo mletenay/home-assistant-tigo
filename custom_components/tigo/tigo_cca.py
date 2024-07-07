@@ -18,6 +18,8 @@ class PanelVersionInfo:
 
     def model(self) -> str:
         """Return panel unit model."""
+        if self.hw is None:
+            return None
         if "455" in self.hw:
             return "TS4-A-M"
         if "461" in self.hw or "462" in self.hw:
