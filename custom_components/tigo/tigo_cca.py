@@ -301,7 +301,7 @@ class _MeshdatapowereParser(_TableParser):
                 pass
 
     def _on_tr_end(self) -> None:
-        if self._status and "hrs" not in self._age and "min" not in self._age:
+        if self._status and self._age and "hrs" not in self._age and "min" not in self._age:
             self._cca.panels[self._status.label] = self._status
         self._status = None
 
