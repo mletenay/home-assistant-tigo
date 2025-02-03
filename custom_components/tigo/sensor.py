@@ -13,6 +13,10 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
+from homeassistant.components.binary_sensor import (
+    BinarySensorDeviceClass,
+)
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     EntityCategory,
@@ -94,6 +98,13 @@ _STATUS: TigoSensorEntityDescription = TigoSensorEntityDescription(
     getter=lambda panel: panel.status if not panel.outdated else None,
     # entity_category=EntityCategory.DIAGNOSTIC,
 )
+_ONLINE: TigoSensorEntityDescription = TigoSensorEntityDescription(
+    key="online",
+    device_class=BinarySensorDeviceClass.CONNECTIVITY,
+    icon="mdi:connection",
+    getter=lambda panel: not panel.outdated,
+    entity_category=EntityCategory.DIAGNOSTIC,
+)
 _RSSI: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="rssi",
     device_class=SensorDeviceClass.SIGNAL_STRENGTH,
@@ -112,6 +123,7 @@ _PANEL_SENSORS: tuple[TigoSensorEntityDescription] = (
     _TEMP,
     _PWM,
     _STATUS,
+    _ONLINE,
     _RSSI,
 )
 
