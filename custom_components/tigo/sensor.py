@@ -50,48 +50,48 @@ _VOLTAGE_IN: TigoSensorEntityDescription = TigoSensorEntityDescription(
     device_class=SensorDeviceClass.VOLTAGE,
     state_class=SensorStateClass.MEASUREMENT,
     native_unit_of_measurement=UnitOfElectricPotential.VOLT,
-    getter=lambda panel: panel.voltage_in,
+    getter=lambda panel: panel.voltage_in if not panel.outdated else None,
 )
 _VOLTAGE_OUT: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="voltage_out",
     device_class=SensorDeviceClass.VOLTAGE,
     state_class=SensorStateClass.MEASUREMENT,
     native_unit_of_measurement=UnitOfElectricPotential.VOLT,
-    getter=lambda panel: panel.voltage_out,
+    getter=lambda panel: panel.voltage_out if not panel.outdated else None,
 )
 _CURRENT: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="current",
     device_class=SensorDeviceClass.CURRENT,
     state_class=SensorStateClass.MEASUREMENT,
     native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
-    getter=lambda panel: panel.current,
+    getter=lambda panel: panel.current if not panel.outdated else None,
 )
 _POWER: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="power",
     device_class=SensorDeviceClass.POWER,
     state_class=SensorStateClass.MEASUREMENT,
     native_unit_of_measurement=UnitOfPower.WATT,
-    getter=lambda panel: panel.power,
+    getter=lambda panel: panel.power if not panel.outdated else None,
 )
 _TEMP: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="temperature",
     device_class=SensorDeviceClass.TEMPERATURE,
     state_class=SensorStateClass.MEASUREMENT,
     native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-    getter=lambda panel: panel.temperature,
+    getter=lambda panel: panel.temperature if not panel.outdated else None,
 )
 _PWM: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="pwm",
     state_class=SensorStateClass.MEASUREMENT,
     icon="mdi:numeric",
-    getter=lambda panel: panel.pwm,
+    getter=lambda panel: panel.pwm if not panel.outdated else None,
     # entity_category=EntityCategory.DIAGNOSTIC,
 )
 _STATUS: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="status",
     state_class=SensorStateClass.MEASUREMENT,
     icon="mdi:information-outline",
-    getter=lambda panel: panel.status,
+    getter=lambda panel: panel.status if not panel.outdated else None,
     # entity_category=EntityCategory.DIAGNOSTIC,
 )
 _RSSI: TigoSensorEntityDescription = TigoSensorEntityDescription(
@@ -99,7 +99,7 @@ _RSSI: TigoSensorEntityDescription = TigoSensorEntityDescription(
     device_class=SensorDeviceClass.SIGNAL_STRENGTH,
     state_class=SensorStateClass.MEASUREMENT,
     native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
-    getter=lambda panel: panel.temperature,
+    getter=lambda panel: panel.temperature if not panel.outdated else None,
     entity_category=EntityCategory.DIAGNOSTIC,
     entity_registry_enabled_default=False,
 )

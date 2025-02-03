@@ -47,6 +47,7 @@ class PanelStatus:
 
     mac: str = None
     label: str = None
+    outdated: bool = False
     voltage_in: float = None
     voltage_out: float = None
     current: float = None
@@ -281,6 +282,8 @@ class _MeshdatapowereParser(_TableParser):
                 self._status.label = data.strip()
             case 4:
                 self._age = data
+                if "hrs" in self._age or "min" in self._age:
+                    self._status.outdated = True
             case 13:
                 self._status.voltage_in = float(data)
             case 14:
@@ -301,7 +304,7 @@ class _MeshdatapowereParser(_TableParser):
                 pass
 
     def _on_tr_end(self) -> None:
-        if self._status and self._age and "hrs" not in self._age and "min" not in self._age:
+        if self._status and self._age:
             self._cca.panels[self._status.label] = self._status
         self._status = None
 
