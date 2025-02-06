@@ -110,7 +110,7 @@ _RSSI: TigoSensorEntityDescription = TigoSensorEntityDescription(
     device_class=SensorDeviceClass.SIGNAL_STRENGTH,
     state_class=SensorStateClass.MEASUREMENT,
     native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
-    getter=lambda panel: panel.temperature if not panel.outdated else None,
+    getter=lambda panel: panel.rssi if not panel.outdated else None,
     entity_category=EntityCategory.DIAGNOSTIC,
     entity_registry_enabled_default=False,
 )
