@@ -24,7 +24,6 @@ from homeassistant.const import (
     UnitOfElectricPotential,
     UnitOfPower,
     UnitOfTemperature,
-    SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -110,7 +109,6 @@ _RSSI: TigoSensorEntityDescription = TigoSensorEntityDescription(
     key="rssi",
     device_class=SensorDeviceClass.SIGNAL_STRENGTH,
     state_class=SensorStateClass.MEASUREMENT,
-    native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS_MILLIWATT,
     getter=lambda panel: panel.rssi if not panel.outdated else None,
     entity_category=EntityCategory.DIAGNOSTIC,
     entity_registry_enabled_default=False,
