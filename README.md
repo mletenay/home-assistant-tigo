@@ -1,3 +1,5 @@
+<img src="https://img.shields.io/badge/dynamic/json?color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.tigo.total">
+
 # Tigo CCA (local network) monitoring for Home Assistant
 
 Home assistant custom integration for local network monitoring of Tigo's Cloud Connect Advanced gateway and connected PV panel modules/optimizers like Tigo TS4-A-O.
@@ -28,4 +30,5 @@ The component requires the hostname/IP (plus username/passwd when required) of t
 
 ## See also
 
+https://github.com/gongloo/TigoTell  
 https://github.com/rp-/tigo-exporter
